@@ -24,8 +24,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.HashMap
 
 
-/** FlutterQcloudcosxmlPlugin */
-class FlutterQcloudcosxmlPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, JShare {
+class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware, JShare {
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -41,7 +40,7 @@ class FlutterQcloudcosxmlPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
                 // we stop the registering process immediately because the ImagePicker requires an activity.
                 return
             }
-            val plugin = FlutterQcloudcosxmlPlugin()
+            val plugin = FlutterSocialSharePlugin()
             Messages.setup(registrar.messenger(), plugin)
         }
     }
