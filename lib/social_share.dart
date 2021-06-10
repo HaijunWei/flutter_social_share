@@ -1,7 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
+
+class SocialShareConfig {
+  SocialShareConfig({
+    required this.ios,
+    required this.android,
+  });
+
+  final SocialShareInitOption ios;
+  final SocialShareInitOption android;
+}
 
 class SocialShareInitOption {
   SocialShareInitOption({
@@ -67,11 +78,11 @@ class ShareMessage {
     this.text,
     this.title,
     required this.platform,
-    this.thumbUrl,
+    this.thumb,
     this.image,
   });
 
-  /// 类型，0 = 文本，1 = 图片，3 = 链接
+  /// 类型，0 = 文本，1 = 图片，2 = 链接
   final int mediaType;
 
   /// 链接
@@ -86,8 +97,8 @@ class ShareMessage {
   /// 平台，1 = 微信，2 = 微信朋友圈，3 = 微信收藏，4 = QQ，5 = QQ空间，6 = Weibo，7 = WeiboContact
   final int platform;
 
-  /// 缩略图
-  final String? thumbUrl;
+  /// 缩略图路径
+  final String? thumb;
 
   /// 图片路径
   final String? image;
@@ -99,7 +110,7 @@ class ShareMessage {
       'text': text,
       'title': title,
       'platform': platform,
-      'thumbUrl': thumbUrl,
+      'thumb': thumb,
       'image': image,
     };
   }
@@ -111,7 +122,7 @@ class ShareMessage {
       text: map['text'],
       title: map['title'],
       platform: map['platform'],
-      thumbUrl: map['thumbUrl'],
+      thumb: map['thumb'],
       image: map['image'],
     );
   }
@@ -120,35 +131,6 @@ class ShareMessage {
 
   factory ShareMessage.fromJson(String source) =>
       ShareMessage.fromMap(json.decode(source));
-}
-
-class ShareResult {
-  ShareResult({
-    required this.code,
-    this.message,
-  });
-
-  final int code;
-  final String? message;
-
-  Map<String, dynamic> toMap() {
-    return {
-      'code': code,
-      'message': message,
-    };
-  }
-
-  factory ShareResult.fromMap(Map<String, dynamic> map) {
-    return ShareResult(
-      code: map['code'],
-      message: map['message'],
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory ShareResult.fromJson(String source) =>
-      ShareResult.fromMap(json.decode(source));
 }
 
 class GetUserInfoOption {
@@ -182,6 +164,8 @@ class GetUserInfoResult {
     required this.name,
     required this.iconUrl,
     required this.openId,
+    this.gender,
+    required this.userOriginalResponse,
   });
 
   /// 昵称
@@ -193,11 +177,19 @@ class GetUserInfoResult {
   /// openId
   final String openId;
 
+  /// 社交平台的用户性别，数值1表示男，数值2表示女。
+  final int? gender;
+
+  /// 社交平台提供的用户信息原始数据。
+  final Map userOriginalResponse;
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,
       'iconUrl': iconUrl,
       'openId': openId,
+      'gender': gender,
+      'userOriginalResponse': userOriginalResponse,
     };
   }
 
@@ -206,6 +198,8 @@ class GetUserInfoResult {
       name: map['name'],
       iconUrl: map['iconUrl'],
       openId: map['openId'],
+      gender: map['gender'],
+      userOriginalResponse: Map.from(map['userOriginalResponse']),
     );
   }
 
@@ -215,14 +209,48 @@ class GetUserInfoResult {
       GetUserInfoResult.fromMap(json.decode(source));
 }
 
+class CancelAuthOption {
+  CancelAuthOption({
+    required this.platform,
+  });
+
+  /// 平台，0 = QQ，1 = 微信，2 = 微博
+  final int platform;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'platform': platform,
+    };
+  }
+
+  factory CancelAuthOption.fromMap(Map<String, dynamic> map) {
+    return CancelAuthOption(
+      platform: map['platform'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CancelAuthOption.fromJson(String source) =>
+      CancelAuthOption.fromMap(json.decode(source));
+}
+
 class SocialShare {
   SocialShare({BinaryMessenger? binaryMessenger})
       : _binaryMessenger = binaryMessenger;
 
   final BinaryMessenger? _binaryMessenger;
 
-  Future<void> initialize(SocialShareInitOption arg) async {
-    final Object encoded = arg.toMap();
+  Future<void> initialize(SocialShareConfig arg) async {
+    SocialShareInitOption? option;
+    if (Platform.isIOS) {
+      option = arg.ios;
+    } else if (Platform.isAndroid) {
+      option = arg.android;
+    } else {
+      assert(true, 'Platform not supported.');
+    }
+    final Object encoded = option!.toMap();
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'com.haijunwei.SocialShare.initialize', const StandardMessageCodec(),
         binaryMessenger: _binaryMessenger);
@@ -245,7 +273,7 @@ class SocialShare {
     }
   }
 
-  Future<ShareResult> share(ShareMessage arg) async {
+  Future<void> share(ShareMessage arg) async {
     final Object encoded = arg.toMap();
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'com.haijunwei.SocialShare.share', const StandardMessageCodec(),
@@ -265,10 +293,6 @@ class SocialShare {
         code: (error['code'] as String?)!,
         message: error['message'] as String?,
         details: error['details'],
-      );
-    } else {
-      return ShareResult.fromMap(
-        Map<String, dynamic>.from(replyMap['result'] as Map<dynamic, dynamic>),
       );
     }
   }
@@ -298,6 +322,30 @@ class SocialShare {
     } else {
       return GetUserInfoResult.fromMap(
         Map<String, dynamic>.from(replyMap['result'] as Map<dynamic, dynamic>),
+      );
+    }
+  }
+
+  Future<void> cancelAuth(CancelAuthOption arg) async {
+    final Object encoded = arg.toMap();
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'com.haijunwei.SocialShare.cancelAuth', const StandardMessageCodec(),
+        binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(encoded) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error =
+          (replyMap['error'] as Map<Object?, Object?>?)!;
+      throw PlatformException(
+        code: (error['code'] as String?)!,
+        message: error['message'] as String?,
+        details: error['details'],
       );
     }
   }

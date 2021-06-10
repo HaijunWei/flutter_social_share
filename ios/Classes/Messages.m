@@ -65,7 +65,7 @@ static NSDictionary<NSString*, id>* wrapResult(NSDictionary *result, FlutterErro
         _text = map[@"text"];
         _title = map[@"title"];
         _platform = map[@"platform"];
-        _thumbUrl = map[@"thumbUrl"];
+        _thumb = map[@"thumb"];
         _image = map[@"image"];
     }
     return self;
@@ -78,27 +78,8 @@ static NSDictionary<NSString*, id>* wrapResult(NSDictionary *result, FlutterErro
         @"text": self.text ?: [NSNull null],
         @"title": self.title ?: [NSNull null],
         @"platform": self.platform,
-        @"thumbUrl": self.thumbUrl ?: [NSNull null],
+        @"thumb": self.thumb ?: [NSNull null],
         @"image": self.image ?: [NSNull null]
-    };
-}
-
-@end
-
-@implementation ShareResult
-
-- (instancetype)initWithMap:(NSDictionary *)map {
-    if (self = [super init]) {
-        _code = map[@"code"];
-        _message = map[@"message"];
-    }
-    return self;
-}
-
-- (NSDictionary *)toMap {
-    return @{
-        @"code": self.code,
-        @"message": self.message ?: [NSNull null]
     };
 }
 
@@ -142,6 +123,23 @@ static NSDictionary<NSString*, id>* wrapResult(NSDictionary *result, FlutterErro
 
 @end
 
+@implementation CancelAuthOption
+
+- (instancetype)initWithMap:(NSDictionary *)map {
+    if (self = [super init]) {
+        _platform = map[@"platform"];
+    }
+    return self;
+}
+
+- (NSDictionary *)toMap {
+    return @{
+        @"platform": self.platform
+    };
+}
+
+@end
+
 void SocialShareSetup(id<FlutterBinaryMessenger> binaryMessenger, id<SocialShare> api) {
     {
       FlutterBasicMessageChannel *channel =
@@ -168,8 +166,8 @@ void SocialShareSetup(id<FlutterBinaryMessenger> binaryMessenger, id<SocialShare
       if (api) {
         [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
             ShareMessage *input = [[ShareMessage alloc] initWithMap:message];
-            [api share:input completion:^(ShareResult * result, FlutterError * error) {
-                callback(wrapResult([result toMap], error));
+            [api share:input completion:^(FlutterError * error) {
+                callback(wrapResult(nil, error));
             }];
         }];
       }
@@ -187,6 +185,23 @@ void SocialShareSetup(id<FlutterBinaryMessenger> binaryMessenger, id<SocialShare
               GetUserInfoOption *input = [[GetUserInfoOption alloc] initWithMap:message];
               [api getSocialUserInfo:input completion:^(GetUserInfoResult * result, FlutterError * error) {
                   callback(wrapResult([result toMap], error));
+              }];
+          }];
+        }
+        else {
+          [channel setMessageHandler:nil];
+        }
+      }
+    {
+        FlutterBasicMessageChannel *channel =
+          [FlutterBasicMessageChannel
+            messageChannelWithName:@"com.haijunwei.SocialShare.cancelAuth"
+            binaryMessenger:binaryMessenger];
+        if (api) {
+          [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+              CancelAuthOption *input = [[CancelAuthOption alloc] initWithMap:message];
+              [api cancelAuth:input completion:^(FlutterError * error) {
+                  callback(wrapResult(nil, error));
               }];
           }];
         }

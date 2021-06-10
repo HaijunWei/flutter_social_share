@@ -36,18 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *text;
 @property (nonatomic, copy, nullable) NSString *title;
 @property (nonatomic, strong) NSNumber *platform;
-@property (nonatomic, copy, nullable) NSString *thumbUrl;
+@property (nonatomic, copy, nullable) NSString *thumb;
 @property (nonatomic, copy, nullable) NSString *image;
-
-- (instancetype)initWithMap:(NSDictionary *)map;
-- (NSDictionary *)toMap;
-
-@end
-
-@interface ShareResult : NSObject
-
-@property (nonatomic, strong) NSNumber *code;
-@property (nonatomic, copy, nullable) NSString *message;
 
 - (instancetype)initWithMap:(NSDictionary *)map;
 - (NSDictionary *)toMap;
@@ -74,12 +64,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface CancelAuthOption : NSObject
+
+@property (nonatomic, strong) NSNumber *platform;
+
+- (instancetype)initWithMap:(NSDictionary *)map;
+- (NSDictionary *)toMap;
+
+@end
+
 
 @protocol SocialShare <NSObject>
 
 - (void)initialize:(SocialShareInitOption *)input completion:(void(^)(FlutterError *_Nullable))completion;
-- (void)share:(ShareMessage *)input completion:(void(^)(ShareResult *_Nullable, FlutterError *_Nullable))completion;
+- (void)share:(ShareMessage *)input completion:(void(^)(FlutterError *_Nullable))completion;
 - (void)getSocialUserInfo:(GetUserInfoOption *)input completion:(void(^)(GetUserInfoResult *_Nullable, FlutterError *_Nullable))completion;
+- (void)cancelAuth:(CancelAuthOption *)input completion:(void(^)(FlutterError *_Nullable))completion;
 
 @end
 

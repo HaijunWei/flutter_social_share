@@ -24,12 +24,16 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    SocialShare().initialize(
-      SocialShareInitOption(
+    SocialShare().initialize(SocialShareConfig(
+      ios: SocialShareInitOption(
         appKey: 'AppKey copied from JiGuang Portal application',
         universalLink: 'https://sv42fn.jmlk.co/ae68e02b59822c4ea458b74d/',
       ),
-    );
+      android: SocialShareInitOption(
+        appKey: 'AppKey copied from JiGuang Portal application',
+        universalLink: 'https://sv42fn.jmlk.co/ae68e02b59822c4ea458b74d/',
+      ),
+    ));
   }
 
   @override
