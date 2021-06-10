@@ -83,7 +83,7 @@ class ShareMessage {
   /// 标题
   final String? title;
 
-  /// 平台，0 = QQ，1 = 微信，2 = 微博
+  /// 平台，1 = 微信，2 = 微信朋友圈，3 = 微信收藏，4 = QQ，5 = QQ空间，6 = Weibo，7 = WeiboContact
   final int platform;
 
   /// 缩略图
