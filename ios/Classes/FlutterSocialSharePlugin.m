@@ -73,6 +73,8 @@
             result.name = userInfo.name;
             result.iconUrl = userInfo.iconurl;
             result.openId = userInfo.openid;
+            result.gender = userInfo.gender != 0 ? @(userInfo.gender) : nil;
+            result.userOriginalResponse = userInfo.userOriginalResponse;
             completion(result, nil);
         }
     }];
@@ -91,6 +93,10 @@
     completion(nil);
 }
 
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    return [JSHAREService handleOpenUrl:url];
+}
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     return [JSHAREService handleOpenUrl:url];
