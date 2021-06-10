@@ -58,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *iconUrl;
 @property (nonatomic, copy) NSString *openId;
+@property (nonatomic, strong, nullable) NSNumber *gender;
+@property (nonatomic, strong) NSDictionary *userOriginalResponse;
 
 - (instancetype)initWithMap:(NSDictionary *)map;
 - (NSDictionary *)toMap;

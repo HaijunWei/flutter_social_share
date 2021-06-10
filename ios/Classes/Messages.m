@@ -109,6 +109,8 @@ static NSDictionary<NSString*, id>* wrapResult(NSDictionary *result, FlutterErro
         _name = map[@"name"];
         _iconUrl = map[@"iconUrl"];
         _openId = map[@"openId"];
+        _gender = map[@"gender"];
+        _userOriginalResponse = map[@"userOriginalResponse"];
     }
     return self;
 }
@@ -118,6 +120,8 @@ static NSDictionary<NSString*, id>* wrapResult(NSDictionary *result, FlutterErro
         @"name": self.name,
         @"iconUrl": self.iconUrl,
         @"openId": self.openId,
+        @"gender": self.gender ?: [NSNull null],
+        @"userOriginalResponse": self.userOriginalResponse,
     };
 }
 
