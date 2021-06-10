@@ -38,6 +38,7 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    implementation 'cn.jiguang.sdk:jcore:2.5.1'
     implementation 'cn.jiguang.sdk:jshare:2.0.0'
     implementation 'cn.jiguang.sdk:jshare-qqmodel:2.0.0'
     implementation 'cn.jiguang.sdk:jshare-wechatmodel:2.0.0'
