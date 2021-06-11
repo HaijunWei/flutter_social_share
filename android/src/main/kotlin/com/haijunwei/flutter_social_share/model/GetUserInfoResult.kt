@@ -1,6 +1,6 @@
 package com.haijunwei.flutter_social_share.model
 
-import java.util.*
+import java.util.HashMap
 
 /**
  *
@@ -14,7 +14,7 @@ data class GetUserInfoResult(
         var iconUrl: String? = "",
         var gender:Int?=0,
         var openId: String? = "",
-        var userOriginalResponse:Map<Any,Any>?= null
+        var userOriginalResponse:String?=""
 ) {
     fun toMap(): Map<String, Any?> {
         val toMapResult: MutableMap<String, Any?> = HashMap()
@@ -35,7 +35,7 @@ data class GetUserInfoResult(
             fromMapResult.iconUrl = map["iconUrl"] as? String
             fromMapResult.openId = map["openId"] as? String
             fromMapResult.gender = map["gender"] as? Int
-//            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? String
+            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? String
             return fromMapResult
         }
     }
