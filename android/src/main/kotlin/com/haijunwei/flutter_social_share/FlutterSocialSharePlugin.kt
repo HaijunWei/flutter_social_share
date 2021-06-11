@@ -136,22 +136,20 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
             }
         }
 
+        JShareInterface.share(platform, shareParams, object : PlatActionListener {
+            override fun onComplete(p0: Platform?, p1: Int, p2: HashMap<String, Any>?) {
 
-        activityBinding?.activity?.runOnUiThread {
-            JShareInterface.share(platform, shareParams, object : PlatActionListener {
-                override fun onComplete(p0: Platform?, p1: Int, p2: HashMap<String, Any>?) {
-                    result?.success(null)
-                }
+                activityBinding?.activity?.runOnUiThread { result?.success(null)}
+            }
 
-                override fun onCancel(p0: Platform?, p1: Int) {
-                    result?.error(Throwable("share canceled"))
-                }
+            override fun onCancel(p0: Platform?, p1: Int) {
+                activityBinding?.activity?.runOnUiThread {result?.error(Throwable("share canceled"))}
+            }
 
-                override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
-                    result?.error(p3 ?: Throwable("${p0?.name} share error"))
-                }
-            })
-        }
+            override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
+                activityBinding?.activity?.runOnUiThread { result?.error(p3 ?: Throwable("${p0?.name} share error"))}
+            }
+        })
     }
 
     override fun authorization(options: GetUserInfoOption?, result: com.haijunwei.flutter_social_share.Result<GetUserInfoResult?>?) {
@@ -167,15 +165,15 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
 
 
         if (!JShareInterface.isSupportAuthorize(platform)) {
-            result?.error(Throwable("该平台暂不支持授权"))
+            activityBinding?.activity?.runOnUiThread { result?.error(Throwable("该平台暂不支持授权"))}
             return
         }
 
-        val authListener = object :AuthListener{
+        val authListener = object : AuthListener {
             override fun onComplete(platform: Platform?, action: Int, data: BaseResponseInfo?) {
                 when (action) {
                     Platform.ACTION_USER_INFO -> {
-                        val auth  = data as UserInfo
+                        val auth = data as UserInfo
                         val info = GetUserInfoResult()
                         info.name = auth.name
                         info.iconUrl = auth.imageUrl
@@ -183,24 +181,24 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                         info.gender = auth.gender
                         info.userOriginalResponse = auth.originData
 
-                        result?.success(info)
+
+                        activityBinding?.activity?.runOnUiThread {result?.success(info)}
                     }
-                    else->{
-                        result?.error(Throwable("${platform?.name} authorization error"))
+                    else -> {
+                        activityBinding?.activity?.runOnUiThread { result?.error(Throwable("${platform?.name} authorization error"))}
                     }
                 }
             }
 
             override fun onCancel(p0: Platform?, p1: Int) {
-                result?.error(Throwable("authorization canceled"))
+                activityBinding?.activity?.runOnUiThread { result?.error(Throwable("authorization canceled"))}
             }
 
             override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
-                result?.error(p3?:Throwable("${p0?.name} authorization error"))
+                activityBinding?.activity?.runOnUiThread {result?.error(p3 ?: Throwable("${p0?.name} authorization error"))}
             }
         }
 
-        activityBinding?.activity?.runOnUiThread {
             if (JShareInterface.isAuthorize(platform)) {
                 JShareInterface.getUserInfo(platform, authListener)
             } else {
@@ -220,7 +218,6 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                     }
 
                 })
-            }
         }
     }
 
