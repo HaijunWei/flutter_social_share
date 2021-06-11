@@ -183,7 +183,7 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                         info.iconUrl = auth.imageUrl
                         info.openId = auth.openid
                         info.gender = auth.gender
-                        info.userOriginalResponse = JsonUtil().fromJson(auth.originData)
+//                        info.userOriginalResponse = auth.originData
 
 
                         activityBinding?.activity?.runOnUiThread {result?.success(info)}

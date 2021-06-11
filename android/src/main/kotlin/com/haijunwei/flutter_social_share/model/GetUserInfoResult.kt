@@ -13,8 +13,8 @@ data class GetUserInfoResult(
         var name: String? = "",
         var iconUrl: String? = "",
         var gender:Int?=0,
-        var openId: String? = "",
-        var userOriginalResponse:Map<String,Any>?= null
+        var openId: String? = ""
+//        var userOriginalResponse:String?= null
 ) {
     fun toMap(): Map<String, Any?> {
         val toMapResult: MutableMap<String, Any?> = HashMap()
@@ -22,7 +22,7 @@ data class GetUserInfoResult(
         toMapResult["iconUrl"] = iconUrl
         toMapResult["openId"] = openId
         toMapResult["gender"] = gender
-        toMapResult["userOriginalResponse"] = userOriginalResponse
+//        toMapResult["userOriginalResponse"] = userOriginalResponse
 
         return toMapResult
     }
@@ -35,7 +35,7 @@ data class GetUserInfoResult(
             fromMapResult.iconUrl = map["iconUrl"] as? String
             fromMapResult.openId = map["openId"] as? String
             fromMapResult.gender = map["gender"] as? Int
-//            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? Map<String,Any>?
+//            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? String
             return fromMapResult
         }
     }
