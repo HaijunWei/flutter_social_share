@@ -136,20 +136,22 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
             }
         }
 
-        JShareInterface.share(platform, shareParams, object : PlatActionListener {
-            override fun onComplete(p0: Platform?, p1: Int, p2: HashMap<String, Any>?) {
-                result?.success(null)
-            }
 
-            override fun onCancel(p0: Platform?, p1: Int) {
-                result?.error(Throwable("share canceled"))
-            }
+        activityBinding?.activity?.runOnUiThread {
+            JShareInterface.share(platform, shareParams, object : PlatActionListener {
+                override fun onComplete(p0: Platform?, p1: Int, p2: HashMap<String, Any>?) {
+                    result?.success(null)
+                }
 
-            override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
-                result?.error(p3 ?: Throwable("${p0?.name} share error"))
-            }
-        })
+                override fun onCancel(p0: Platform?, p1: Int) {
+                    result?.error(Throwable("share canceled"))
+                }
 
+                override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
+                    result?.error(p3 ?: Throwable("${p0?.name} share error"))
+                }
+            })
+        }
     }
 
     override fun authorization(options: GetUserInfoOption?, result: com.haijunwei.flutter_social_share.Result<GetUserInfoResult?>?) {
@@ -198,25 +200,27 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
             }
         }
 
-        if (JShareInterface.isAuthorize(platform)) {
-            JShareInterface.getUserInfo(platform, authListener)
-        } else {
-            JShareInterface.authorize(platform, object : AuthListener {
-                override fun onComplete(p0: Platform, p1: Int, p2: BaseResponseInfo?) {
-                    if (p1 == Platform.ACTION_AUTHORIZING) {
-                        JShareInterface.getUserInfo(p0.name, authListener)
+        activityBinding?.activity?.runOnUiThread {
+            if (JShareInterface.isAuthorize(platform)) {
+                JShareInterface.getUserInfo(platform, authListener)
+            } else {
+                JShareInterface.authorize(platform, object : AuthListener {
+                    override fun onComplete(p0: Platform, p1: Int, p2: BaseResponseInfo?) {
+                        if (p1 == Platform.ACTION_AUTHORIZING) {
+                            JShareInterface.getUserInfo(p0.name, authListener)
+                        }
                     }
-                }
 
-                override fun onCancel(p0: Platform?, p1: Int) {
-                    authListener.onCancel(p0, p1)
-                }
+                    override fun onCancel(p0: Platform?, p1: Int) {
+                        authListener.onCancel(p0, p1)
+                    }
 
-                override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
-                    authListener.onError(p0, p1, p2, p3)
-                }
+                    override fun onError(p0: Platform?, p1: Int, p2: Int, p3: Throwable?) {
+                        authListener.onError(p0, p1, p2, p3)
+                    }
 
-            })
+                })
+            }
         }
     }
 
