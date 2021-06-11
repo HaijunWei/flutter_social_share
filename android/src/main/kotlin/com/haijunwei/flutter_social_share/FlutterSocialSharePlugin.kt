@@ -1,10 +1,12 @@
 package com.haijunwei.flutter_social_share
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import androidx.annotation.NonNull
 import cn.jiguang.share.android.api.*
 import cn.jiguang.share.android.model.BaseResponseInfo
 import cn.jiguang.share.android.model.UserInfo
+import cn.jiguang.share.android.utils.JsonUtil
 import cn.jiguang.share.qqmodel.QQ
 import cn.jiguang.share.qqmodel.QZone
 import cn.jiguang.share.wechat.Wechat
@@ -21,7 +23,9 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import java.util.HashMap
+import java.io.ByteArrayOutputStream
+import java.io.FileInputStream
+import java.util.*
 
 
 class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware, JShare {
@@ -126,13 +130,13 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                 shareParams.text = options.text
             }
             Platform.SHARE_IMAGE -> {
-                shareParams.imagePath = options.image
+                shareParams.imageData =  BitmapFactory.decodeFile(options.image)
             }
             Platform.SHARE_WEBPAGE -> {
                 shareParams.title = options.title
                 shareParams.text = options.text
                 shareParams.url = options.url
-                shareParams.imagePath = options.thumb
+                shareParams.imageData =  BitmapFactory.decodeFile(options.thumb)
             }
         }
 
@@ -179,7 +183,7 @@ class FlutterSocialSharePlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                         info.iconUrl = auth.imageUrl
                         info.openId = auth.openid
                         info.gender = auth.gender
-                        info.userOriginalResponse = auth.originData
+                        info.userOriginalResponse = JsonUtil().fromJson(auth.originData)
 
 
                         activityBinding?.activity?.runOnUiThread {result?.success(info)}
