@@ -35,7 +35,7 @@ data class GetUserInfoResult(
             fromMapResult.iconUrl = map["iconUrl"] as? String
             fromMapResult.openId = map["openId"] as? String
             fromMapResult.gender = map["gender"] as? Int
-            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? Map<String,Any>
+//            fromMapResult.userOriginalResponse = map["userOriginalResponse"] as? Map<String,Any>?
             return fromMapResult
         }
     }
